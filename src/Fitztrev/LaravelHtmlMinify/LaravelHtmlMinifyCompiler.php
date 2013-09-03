@@ -23,11 +23,12 @@ class LaravelHtmlMinifyCompiler extends BladeCompiler {
 		// If there are, we won't bother to compress this view.
 		if ( !preg_match('/<(pre|textarea)/', $value) ) {
 			// Remove whitespace characters
+			$value = str_replace(array("//<![CDATA[", "//]]>"), "", $value);
+			
 			$replace = array(
-				"/\n/" => '',  // New lines
-				"/\r/" => '',  // Carriage returns
-				"/\t/" => ' ', // Tabs
-				"/ +/" => ' ', // Multiple spaces
+				"/\s{2,}/" => ' ',  // Two or more whitespace characters into one,
+				"/>\s</" => '><',  // Remove whitespace between html tags
+				"/<!--[^\[](.*?)[^\]]-->/" => '', // HTML comments (except IE conditional comments)
 			);
 			$value = preg_replace(array_keys($replace), array_values($replace), $value);
 		}
